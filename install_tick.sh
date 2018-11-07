@@ -1,5 +1,5 @@
 #!/bin/bash
-sudo dpkg -i telegraf_1.8.1-1_amd64.deb
+#sudo dpkg -i telegraf_1.8.1-1_amd64.deb
 sudo dpkg -i influxdb_1.6.3_amd64.deb
 sudo dpkg -i chronograf_1.6.2_amd64.deb
 sudo dpkg -i kapacitor_1.5.1_amd64.deb
