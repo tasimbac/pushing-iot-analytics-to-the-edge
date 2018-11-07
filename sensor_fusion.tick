@@ -1,0 +1,44 @@
+dbrp "iot1"."autogen"
+var temperatureCritical = 220
+
+var pressureCritical = 1100
+
+var humidityCritical = 70
+
+var data = batch
+    |query('SELECT * FROM "iot1"."autogen".sensor_fusion WHERE time > now() - 60s')
+        .period(5m)
+        .every(5m)
+
+// Calculate and POST 5 minute mean of temperature data
+data
+    |mean('temperature')
+    |httpPost('https://influxdata-dff87.firebaseio.com//SensorFusion/temperature.json')
+
+// Report in real-time all data points where an anomaly in temperature is detected
+data
+    |alert()
+        .warn(lambda: "temperature" > temperatureCritical - 2)
+        .post('https://influxdata-dff87.firebaseio.com//SensorFusion/temperatureWarn.json')
+
+// Calculate and POST 5 minute mean of pressure data
+data
+    |mean('pressure')
+    |httpPost('https://influxdata-dff87.firebaseio.com//SensorFusion/pressure.json')
+
+// Report in real-time all data points where an anomaly in pressure is detected
+data
+    |alert()
+        .warn(lambda: "pressure" > pressureCritical - 2)
+        .post('https://influxdata-dff87.firebaseio.com//SensorFusion/pressureWarn.json')
+
+// Calculate and POST 5 minute mean of humidity data
+data
+    |mean('humidity')
+    |httpPost('https://influxdata-dff87.firebaseio.com//SensorFusion/humidity.json')
+
+// Report in real-time all data points where an anomaly in humidity is detected
+data
+    |alert()
+        .warn(lambda: "humidity" > humidityCritical - 2)
+        .post('https://influxdata-dff87.firebaseio.com//SensorFusion/humidityWarn.json')
